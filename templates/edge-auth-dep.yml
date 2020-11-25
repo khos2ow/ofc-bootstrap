@@ -32,7 +32,8 @@ spec:
             secretName: of-customers
       containers:
       - name: edge-auth
-        image: openfaas/edge-auth:0.7.1
+        # image: openfaas/edge-auth:0.7.1
+        image: alexellis2/edge-auth-mattermost-gitlab:0.1.1
         imagePullPolicy: Always
         livenessProbe:
           httpGet:

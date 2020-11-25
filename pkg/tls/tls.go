@@ -53,8 +53,8 @@ func Apply(plan types.Plan) error {
 func listTLSTemplates() ([]string, error) {
 
 	return []string{
-		"issuer-prod.yml",
-		"issuer-staging.yml",
+		// "issuer-prod.yml",
+		// "issuer-staging.yml",
 		"wildcard-domain-cert.yml",
 		"auth-domain-cert.yml",
 	}, nil

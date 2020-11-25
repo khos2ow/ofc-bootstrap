@@ -17,7 +17,7 @@ functions:
       validate_token: false
       write_debug: true
       read_debug: true
-      installation_tag: "openfaas-cloud"
+      installation_tag: "functions"
       gitlab_instance: "{{.GitLabInstance}}"
       customers_path: "{{.CustomersSecretPath}}"
     environment_file:
@@ -65,7 +65,8 @@ functions:
   git-tar:
     lang: dockerfile
     handler: ./git-tar
-    image: functions/of-git-tar:0.17.0
+    # image: functions/of-git-tar:0.17.0
+    image: alexellis2/mattermost-git-tar:0.1.0
     labels:
       openfaas-cloud: "1"
       role: openfaas-system

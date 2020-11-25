@@ -14,10 +14,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/alexellis/arkade/pkg/helm"
 	execute "github.com/alexellis/go-execute/pkg/v1"
-	"github.com/alexellis/k3sup/pkg/config"
-	"github.com/alexellis/k3sup/pkg/env"
 	"github.com/openfaas/ofc-bootstrap/pkg/ingress"
 	"github.com/openfaas/ofc-bootstrap/pkg/stack"
 	"github.com/openfaas/ofc-bootstrap/pkg/tls"
@@ -109,27 +106,33 @@ func runApplyCommandE(command *cobra.Command, _ []string) error {
 		return fmt.Errorf("error while retreiving features: %s", featuresErr.Error())
 	}
 
-	const helm3Version = "v3.1.2"
-	os.Setenv("HELM_VERSION", helm3Version)
+	// const helm3Version = "v3.1.2"
+	// os.Setenv("HELM_VERSION", helm3Version)
 
-	userPath, err := config.InitUserDir()
-	if err != nil {
-		return err
-	}
+	// userPath, err := config.InitUserDir()
+	// if err != nil {
+	// 	return err
+	// }
 
-	clientArch, clientOS := env.GetClientArch()
-	helmPathOut, err := helm.TryDownloadHelm(userPath, clientArch, clientOS, true)
+	// clientArch, clientOS := env.GetClientArch()
+	// helmPathOut, err := helm.TryDownloadHelm(userPath, clientArch, clientOS, true)
 
-	if err != nil {
-		return err
-	}
+	// if err != nil {
+	// 	return err
+	// }
 
-	log.Printf("helm3 at: %s\n", helmPathOut)
+	// log.Printf("helm3 at: %s\n", helmPathOut)
 
-	additionalPaths := []string{helmPathOut}
+	// additionalPaths := []string{helmPathOut}
+	additionalPaths := []string{}
 
 	pathCurrent := os.Getenv("PATH")
-	newPath := strings.Join(additionalPaths, ":") + ":" + pathCurrent
+	newPath := ""
+	if len(additionalPaths) > 0 {
+		newPath = strings.Join(additionalPaths, ":") + ":" + pathCurrent
+	} else {
+		newPath = pathCurrent
+	}
 	os.Setenv("PATH", newPath)
 
 	log.Printf("Validating tools available in PATH: %q\n", newPath)
@@ -278,15 +281,15 @@ func process(plan types.Plan, prefs InstallPreferences, additionalPaths []string
 		return nsErr
 	}
 
-	if err := helmRepoAdd("stable", "https://charts.helm.sh/stable"); err != nil {
-		log.Println(err.Error())
-		return err
-	}
+	// if err := helmRepoAdd("stable", "https://charts.helm.sh/stable"); err != nil {
+	// 	log.Println(err.Error())
+	// 	return err
+	// }
 
-	if err := helmRepoAdd("ingress-nginx", "https://kubernetes.github.io/ingress-nginx"); err != nil {
-		log.Println(err.Error())
-		return err
-	}
+	// if err := helmRepoAdd("ingress-nginx", "https://kubernetes.github.io/ingress-nginx"); err != nil {
+	// 	log.Println(err.Error())
+	// 	return err
+	// }
 
 	if err := helmRepoAdd("minio", "https://helm.min.io/"); err != nil {
 		log.Println(err.Error())
@@ -298,11 +301,11 @@ func process(plan types.Plan, prefs InstallPreferences, additionalPaths []string
 		return err
 	}
 
-	installIngressErr := installIngressController(plan.Ingress, additionalPaths)
-	if installIngressErr != nil {
-		log.Println(installIngressErr.Error())
-		return installIngressErr
-	}
+	// installIngressErr := installIngressController(plan.Ingress, additionalPaths)
+	// if installIngressErr != nil {
+	// 	log.Println(installIngressErr.Error())
+	// 	return installIngressErr
+	// }
 
 	if !prefs.SkipCreateSecrets {
 		createSecrets(plan)
@@ -320,13 +323,13 @@ func process(plan types.Plan, prefs InstallPreferences, additionalPaths []string
 		}
 	}
 
-	if plan.TLS {
-		cmErr := installCertmanager()
-		if cmErr != nil {
-			log.Println(cmErr)
-			return cmErr
-		}
-	}
+	// if plan.TLS {
+	// 	cmErr := installCertmanager()
+	// 	if cmErr != nil {
+	// 		log.Println(cmErr)
+	// 		return cmErr
+	// 	}
+	// }
 
 	functionAuthErr := createFunctionsAuth()
 	if functionAuthErr != nil {
@@ -338,17 +341,17 @@ func process(plan types.Plan, prefs InstallPreferences, additionalPaths []string
 		log.Println(ofErr)
 	}
 
-	retries := 260
-	if plan.TLS {
-		for i := 0; i < retries; i++ {
-			log.Printf("Is cert-manager ready? %d/%d\n", i+1, retries)
-			ready := certManagerReady()
-			if ready {
-				break
-			}
-			time.Sleep(time.Second * 2)
-		}
-	}
+	// retries := 260
+	// if plan.TLS {
+	// 	for i := 0; i < retries; i++ {
+	// 		log.Printf("Is cert-manager ready? %d/%d\n", i+1, retries)
+	// 		ready := certManagerReady()
+	// 		if ready {
+	// 			break
+	// 		}
+	// 		time.Sleep(time.Second * 2)
+	// 	}
+	// }
 
 	ingressErr := ingress.Apply(plan)
 	if ingressErr != nil {
